@@ -16,6 +16,17 @@
 CircularBuffer<byte,64> gSERRxBuffer; 
 CircularBuffer<byte,64> gSERTxBuffer;
 
+// State machine
+enum enProcessStates
+{
+  STATE_IDLE,             // inital state, waiting for packet to start
+  STATE_CMD_LEN,          // start-of-packet received, waiting for packet length
+  STATE_CMD_ID,           // packet length recived, waiting for ID [optional]
+};
+enum enProcessStates gProcessState = STATE_IDLE;
+byte gMsgCheckSum = 0;
+byte gMsgLength = 0;
+
 // Serial Communication recive process
 void procSERRecive()
 {
@@ -43,6 +54,28 @@ void procSERSend()
 void procProcessData()
 {
   
+  // if (!gSERRxBuffer.isEmpty())     // process one data at the time
+  while (!gSERRxBuffer.isEmpty())     // process whole buffer; 
+                                      // might be to fast if more than one package in the buffer
+  {
+    // state machine so the communication is not limited to one loop
+    byte nData = gSERRxBuffer.shift();
+    switch (gProcessState)
+    {
+      case STATE_IDLE:
+        if (nData == 0xF0) gProcessState = STATE_CMD_LEN;
+        // else discard data not part of package
+        break;
+      
+      case STATE_CMD_LEN:
+        gMsgLength = nData;
+        gProcessState = STATE_CMD_ID;
+        break;
+      
+      default:
+        break;
+    }
+  }
 }
 
 void setup() 
