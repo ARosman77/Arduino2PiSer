@@ -13,10 +13,11 @@
 #include <CircularBuffer.h>
 
 // Buffers
-CircularBuffer<byte,64> SERRxBuffer; 
-CircularBuffer<byte,64> SERTxBuffer;
+CircularBuffer<byte,64> gSERRxBuffer; 
+CircularBuffer<byte,64> gSERTxBuffer;
 
-void fnSERRecive()
+// Serial Communication recive process
+void procSERRecive()
 {
   while (Serial.available() > 0)
   {
@@ -24,15 +25,17 @@ void fnSERRecive()
   }
 }
 
-void fnSERSend()
+// Serial Communication send process
+void procSERSend()
 {
-  while (!SERTxBuffer.isEmpty())
+  while (!gSERTxBuffer.isEmpty())
   {
-    Serial.write(SERTxBuffer.shift());
+    Serial.write(gSERTxBuffer.shift());
   }
 }
 
-void fnProcessData()
+// Process recive buffer
+void procProcessData()
 {
   
 }
@@ -46,7 +49,7 @@ void setup()
 void loop() 
 {
   // main loop
-  fnSERRecive();
-  fnProcessData();
-  fnSERSend();
+  procSERRecive();
+  procProcessData();
+  procSERSend();
 }
