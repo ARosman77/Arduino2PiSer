@@ -21,7 +21,12 @@ void procSERRecive()
 {
   while (Serial.available() > 0)
   {
-    SERRxBuffer.push(Serial.read());
+    if (!gSERRxBuffer.push(Serial.read()))
+    {
+      // buffer overrun
+      // TODO: do something if overrun happens
+      // IDEA: clean buffer, send error (copy msg to tx buffer)
+    }
   }
 }
 
