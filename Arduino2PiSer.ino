@@ -39,7 +39,7 @@ byte gMsgCmd = 0;
 CircularBuffer<char,64> gMsgParams;
 
 // Serial Communication recive process
-void procSERRecive()
+void procSERReceive()
 {
   while (Serial.available() > 0)
   {
@@ -62,7 +62,7 @@ void procSERSend()
 }
 
 // Process recive buffer
-void procProcessData()
+void procParseMsg()
 {
   if (!gSERRxBuffer.isEmpty())           // process one data at the time
   // while (!gSERRxBuffer.isEmpty())     // process whole buffer; 
@@ -145,7 +145,7 @@ void setup()
 void loop() 
 {
   // main loop
-  procSERRecive();
-  procProcessData();
+  procSERReceive();
+  procParseMsg();
   procSERSend();
 }
