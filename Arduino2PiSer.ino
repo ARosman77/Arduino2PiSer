@@ -10,10 +10,19 @@
 *   
 *   Protocol idea:
 *   
+*   Command :
+*   
 *     <[LEN]/[ID*];[CMD]:[PARAM1] [PARAM2] ... [PARAMn]=[CHKSUM*]>
 *               * optional ID                                  * optional checksum (sum%256)
-*     Each of the data is limited to max 16 chars!
+*     Each of the data fields is limited to max 16 chars!
 *   
+*   Response :
+*   
+*     <[LEN]/[ID*];ACK:[PARAM1=CMD] [PARAM2] ... [PARAMn]=[CHKSUM*]>
+*     <[LEN]/[ID*];NAK:[PARAM1=CMD] [PARAM2=ERROR_CODE]=[CHKSUM*]>
+*               * optional ID                                  * optional checksum (sum%256)
+*     Each of the data fields is limited to max 16 chars!
+*
 */
 
 // #define _DEBUG_INIT
@@ -69,6 +78,14 @@ CircularBuffer<int,16> gMsgParams;
 // CircularBuffer<char,gcMaxDataPartLen> gParseBuffer;
 char gParseBuffer[gcMaxDataPartLen] = {};
 byte gnParseBufferCnt = 0;
+
+// reponse message
+enum enResponseType
+{
+  RESPONSE_NONE,          // not response
+  RESPONSE_ACK,           // processed OK, ACK
+  RESPONSE_NAK,           // error, NAK
+};
 
 // Serial Communication recive process
 void procSERReceive()
@@ -265,6 +282,25 @@ void procExecMsg()
       break;
     
     default:
+      break;
+  }
+}
+
+int fnComposeMsg(byte nCmd, char* nParams, enResponseType nResponse)
+{
+
+  switch (nResponse)
+  {
+    /* <[LEN]/[ID*];[CMD]:[PARAM1] [PARAM2] ... [PARAMn]=[CHKSUM*]> */
+    case RESPONSE_NONE:
+      break;
+
+    /* <[LEN]/[ID*];ACK:[PARAM1=CMD] [PARAM2] ... [PARAMn]=[CHKSUM*]> */
+    case RESPONSE_ACK:
+      break;
+    
+    /* <[LEN]/[ID*];NAK:[PARAM1=CMD] [PARAM2=ERROR_CODE]=[CHKSUM*]> */
+    case RESPONSE_NAK:
       break;
   }
 }
